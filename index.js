@@ -22,6 +22,20 @@ const users = await axios
     console.log(err);
   });
 
+const getComments = async (postId) => {
+  const comments = await axios
+    .get(`http://jsonplaceholder.typicode.com/posts/${postId}/comments`)
+    .then((res) => {
+      if (res.data != undefined) {
+        return res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return comments;
+};
+
 const treatedUsers = users.map((item) => {
   return {
     id: item.id,
@@ -34,18 +48,32 @@ const treatedUsers = users.map((item) => {
   };
 });
 
-posts.forEach((post) => {
-  treatedUsers.forEach((user) => {
-    const treatedPost = {
-      id: post.id,
-      title: post.title,
-      title_crop: post.title.substr(0, 20) + '...',
-      body: post.body,
-    };
-    if (user.id === post.userId) {
-      user.posts.push(treatedPost);
+for (const post of posts) {
+  for (const treatedUser of treatedUsers) {
+    if (treatedUser.id === post.userId) {
+      let comments = [];
+      if (treatedUser.name === 'Ervin Howell') {
+        comments = await getComments(post.id);
+      }
+      const treatedPost = {
+        id: post.id,
+        title: post.title,
+        title_crop: post.title.substr(0, 20) + '...',
+        body: post.body,
+        comments: comments,
+      };
+
+      treatedUser.posts.push(treatedPost);
     }
-  });
-});
+  }
+}
 
 console.log(treatedUsers);
+
+treatedUsers.forEach((treatedUser) => {
+    if (treatedUser.name === 'Ervin Howell') {
+        treatedUser.posts.forEach((post) => {
+            console.log(post);
+        })
+    }
+});
